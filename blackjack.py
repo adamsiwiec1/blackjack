@@ -57,15 +57,26 @@ def print_cards(hand):
         print(x)
 
 
-def find_winner(dealr, playr):
-    dealer = normalize_hand(dealr)
-    player = normalize_hand(playr)
-    if 21 >= player > dealer:
+def find_winner(dlr, plr):
+    dealer = normalize_hand(dlr)
+    player = normalize_hand(plr)
+    if dealer > 21 and player <= 21:
         print(Fore.GREEN + "\nYou won!!!")
-    if player > 21 or player < dealer:
+    elif dealer > player or player > 21:
         print(Fore.RED + "\nYou lost :(")
-    if player == dealer:
+    elif player == dealer:
         print(Fore.YELLOW + "\nPush...")
+    elif 21 >= player > dealer:
+        print(Fore.GREEN + "\nYou won!!!")
+
+
+def dealer_draw(dealr):
+    dealer = normalize_hand(dealr)
+    if dealer < 17:
+        dealr.append(hit(deck))
+        return dealr
+    if dealer >= 17:
+        return dealr
 
 
 if __name__ == "__main__":
@@ -101,8 +112,10 @@ if __name__ == "__main__":
                     decision = raw_input("\nType 'H' to Hit and 'S' to Stand: ").lower()
             if decision == 's':
 
-                print(Fore.MAGENTA + '\nGAME RESULTS:')
+                while normalize_hand(dealerHand) < 17:
+                    dealerHand = dealer_draw(dealerHand)
 
+                print(Fore.MAGENTA + '\nGAME RESULTS:')
                 print(Fore.BLUE + 'Dealer')
                 print_cards(dealerHand)
                 print(Fore.BLUE + 'Player')
