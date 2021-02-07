@@ -5,6 +5,7 @@ from pip._vendor.distlib.compat import raw_input
 
 deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]*4
 
+highcards = ['A','J','Q','K']
 
 def deal(deck):
     hand = []
@@ -36,6 +37,23 @@ def hit(deck):
     return card
 
 
+def normalize_hand(hand, ttl):
+    if 'A' or 'J' or 'Q' or 'K' in hand:
+        print('There are high cards.')
+        for x in hand:
+            if x in highcards:
+                ttl = ttl + 10
+            else:
+                ttl = ttl + x
+    else:
+        ttl = 0
+        for x in hand:
+            ttl = + x
+
+    return ttl
+
+
+
 if __name__ == "__main__":
     print("Hello, Welcome to Blackjack.\n\n")
     name = raw_input("Enter your name to begin: ")
@@ -50,13 +68,20 @@ if __name__ == "__main__":
             print(f'Here are your cards:\n{playerHand[0]}\n{playerHand[1]}')
 
             decision = raw_input("Type 'H' to hit and 'S' to stand.").lower()
+            total = 0
             while decision == 'h':
                 playerHand.append(hit(deck))
-                print(f"The dealer shows:\n{dealerHand[0]}\n{dealerHand[1]}")
-                print(f'Your cards:\n')
+                playerTotal = normalize_hand(playerHand, total)
+                print(str(playerTotal))
+                if playerTotal > 21:
+                    print("You busted!!")
+                print('Dealer hand:')
+                for card in dealerHand:
+                    print(f'{card}')
+                print('\nPlayer hand:')
                 for card in playerHand:
-                    print(f'{card} \n')
-                decision = raw_input("Type 'H' to hit and 'S' to stand.").lower()
+                    print(f'{card}')
+                decision = raw_input("\nType 'H' to hit and 'S' to stand.").lower()
             if decision == 's':
                 print(f"The dealer shows:\n{dealerHand[0]}\n{dealerHand[1]}")
                 print(f'Your cards:\n{playerHand[0]}\n{playerHand[1]}')
