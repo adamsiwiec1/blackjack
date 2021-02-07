@@ -11,7 +11,14 @@ def deal(deck):
     hand = []
     for i in range(2):
         random.shuffle(deck)
-        card = deck.pop()  # The pop() method removes the item at the given index from the list and returns the removed item
+        try:
+            card = deck.pop()  # The pop() method removes the item at the given index from the list and returns the removed item
+        except IndexError:
+            print("A new deck is being shuffled...")
+            deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * 4
+            random.shuffle(deck)
+            print("The new deck has been shuffled.")
+            card = deck.pop()
         if card == 1:
             card = 'A'
         if card == 11:
@@ -37,7 +44,7 @@ def hit(deck):
     return card
 
 
-def normalize_hand(hand, ttl=0):
+def get_total(hand, ttl=0):
     h = []
     a = []
     for x in hand:
@@ -68,8 +75,8 @@ def print_cards(hand):
 
 
 def find_winner(dlr, plr):
-    dealer = normalize_hand(dlr)
-    player = normalize_hand(plr)
+    dealer = get_total(dlr)
+    player = get_total(plr)
     if dealer > 21 and player <= 21:
         print(Fore.GREEN + "\nYou won!!!")
     elif dealer > player or player > 21:
@@ -81,12 +88,22 @@ def find_winner(dlr, plr):
 
 
 def dealer_draw(dealr):
-    dealer = normalize_hand(dealr)
+    dealer = get_total(dealr)
     if dealer < 17:
         dealr.append(hit(deck))
         return dealr
     if dealer >= 17:
         return dealr
+
+
+def game_result(dhand, phand):
+    print(Fore.MAGENTA + '\nGAME RESULTS:')
+    print(Fore.BLUE + 'Dealer')
+    print_cards(dhand)
+    print(Fore.BLUE + 'Player')
+    print_cards(phand)
+    find_winner(dhand, phand)
+
 
 def start_game(userInput):
     playAgain = 'N'
@@ -97,16 +114,14 @@ def start_game(userInput):
             total = 0
             dealerHand = deal(deck)
             playerHand = deal(deck)
-            print(Fore.LIGHTWHITE_EX + f"The dealer shows:\n{dealerHand[0]}")
-            playerTotal = normalize_hand(playerHand, total)
-            print(
-                Fore.LIGHTWHITE_EX + f'Here are your cards: (Total = {str(playerTotal)})\n{playerHand[0]}\n{playerHand[1]}')
-
+            print(Fore.LIGHTWHITE_EX + f"Dealer upcard:\n{dealerHand[0]}")
+            playerTotal = get_total(playerHand, total)
+            print(Fore.LIGHTWHITE_EX + f'Here are your cards: (Total = {str(playerTotal)})\n{playerHand[0]}\n{playerHand[1]}')
             decision = raw_input(Fore.LIGHTMAGENTA_EX + "Type 'H' to hit and 'S' to stand:").lower()
             while decision == 'h':
                 playerHand.append(hit(deck))
-                playerTotal = normalize_hand(playerHand, total)
-                print(Fore.BLUE + 'The dealer shows:')
+                playerTotal = get_total(playerHand, total)
+                print(Fore.BLUE + 'Dealer upcard:')
                 print(dealerHand[0])
                 print(Fore.CYAN + f'Your hand: (Total = {str(playerTotal)})')
                 print_cards(playerHand)
@@ -117,25 +132,22 @@ def start_game(userInput):
                     print(Fore.RED + 'You busted!!')
                     decision = 's'
                 if playerTotal < 21:  # Prompt player to Hit/Stand
-                    decison = 'decision'
-                    while decison != 'h' or 's':
+                    decision = ''
+                    choices = ['h', 's']
+                    while decision not in choices:
                         decision = raw_input(Fore.LIGHTWHITE_EX + "\nType 'H' to Hit and 'S' to Stand: ").lower()
-                        if decision != 'h' or 's':
-                            while decision != 'h'
+                        if decision not in choices:
                             print(Fore.RED + "Make a valid selection.")
-                            decision = raw_input(Fore.LIGHTWHITE_EX + "\nType 'H' to Hit and 'S' to Stand: ").lower()
-            if decision == 's':  # Dont really need this if?
-                while normalize_hand(dealerHand) < 17:
+            if decision == 's':
+                # Dealer draws cards after the hand is over.
+                while get_total(dealerHand) < 17:  # Dealer hits on 16/stands on 17
                     dealerHand = dealer_draw(dealerHand)
 
-                print(Fore.MAGENTA + '\nGAME RESULTS:')
-                print(Fore.BLUE + 'Dealer')
-                print_cards(dealerHand)
-                print(Fore.BLUE + 'Player')
-                print_cards(playerHand)
-                find_winner(dealerHand, playerHand)
-                playAgain = raw_input(Fore.LIGHTMAGENTA_EX + "Would you like to play again? (Y/N) ").lower()
+                # Display game result
+                game_result(dealerHand, playerHand)
 
+                # Ask the player if they will play another hand - continue/break the loop
+                playAgain = raw_input(Fore.LIGHTMAGENTA_EX + "Would you like to play again? (Y/N) ").lower()
     else:
         print(Fore.LIGHTMAGENTA_EX + "Thanks for playing Blackjack!!")
 
