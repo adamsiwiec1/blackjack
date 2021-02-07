@@ -44,15 +44,14 @@ def normalize_hand(hand, ttl=0):
         h.append(x)
         if x == 'A':
             a.append(x)
-    hrange = range(len(h))
-    arange = range(len(a))
+    hrange = range(len(h))  # Get full range of hand
+    arange = range(len(a))  # Get range of aces
 
     for x in hrange:
         if hand[x] not in highcards and hand[x] != 'A':
             ttl = ttl + int(hand[x])
         if hand[x] in highcards and hand[x] != 'A':
             ttl = ttl + 10
-        # h.pop()
     if len(a) > 0:
         for x in arange:
             if ttl >= 11:
@@ -89,12 +88,9 @@ def dealer_draw(dealr):
     if dealer >= 17:
         return dealr
 
-
-if __name__ == "__main__":
-    print(Fore.LIGHTMAGENTA_EX + "Hello, Welcome to Blackjack.")
-    name = raw_input(Fore.LIGHTWHITE_EX + "Enter your name to begin: ")
+def start_game(userInput):
     playAgain = 'N'
-    game = raw_input(Fore.LIGHTMAGENTA_EX + f'Hello, {Fore.CYAN + Style.BRIGHT + str(name)}.' + Fore.LIGHTMAGENTA_EX + Style.NORMAL + " Type 'S' to start and 'R' to run away: ").lower()
+    game = userInput
     if game == 's' or playAgain == 'y':
         print(Fore.LIGHTMAGENTA_EX + '\nDealing...')
         while game == 's':
@@ -103,7 +99,8 @@ if __name__ == "__main__":
             playerHand = deal(deck)
             print(Fore.LIGHTWHITE_EX + f"The dealer shows:\n{dealerHand[0]}")
             playerTotal = normalize_hand(playerHand, total)
-            print(Fore.LIGHTWHITE_EX + f'Here are your cards: (Total = {str(playerTotal)})\n{playerHand[0]}\n{playerHand[1]}')
+            print(
+                Fore.LIGHTWHITE_EX + f'Here are your cards: (Total = {str(playerTotal)})\n{playerHand[0]}\n{playerHand[1]}')
 
             decision = raw_input(Fore.LIGHTMAGENTA_EX + "Type 'H' to hit and 'S' to stand:").lower()
             while decision == 'h':
@@ -120,9 +117,14 @@ if __name__ == "__main__":
                     print(Fore.RED + 'You busted!!')
                     decision = 's'
                 if playerTotal < 21:  # Prompt player to Hit/Stand
-                    decision = raw_input(Fore.LIGHTWHITE_EX + "\nType 'H' to Hit and 'S' to Stand: ").lower()
-            if decision == 's':
-
+                    decison = 'decision'
+                    while decison != 'h' or 's':
+                        decision = raw_input(Fore.LIGHTWHITE_EX + "\nType 'H' to Hit and 'S' to Stand: ").lower()
+                        if decision != 'h' or 's':
+                            while decision != 'h'
+                            print(Fore.RED + "Make a valid selection.")
+                            decision = raw_input(Fore.LIGHTWHITE_EX + "\nType 'H' to Hit and 'S' to Stand: ").lower()
+            if decision == 's':  # Dont really need this if?
                 while normalize_hand(dealerHand) < 17:
                     dealerHand = dealer_draw(dealerHand)
 
@@ -132,7 +134,17 @@ if __name__ == "__main__":
                 print(Fore.BLUE + 'Player')
                 print_cards(playerHand)
                 find_winner(dealerHand, playerHand)
-            playAgain = raw_input(Fore.LIGHTMAGENTA_EX + "Would you like to play again? (Y/N) ").lower()
+                playAgain = raw_input(Fore.LIGHTMAGENTA_EX + "Would you like to play again? (Y/N) ").lower()
+
+    else:
+        print(Fore.LIGHTMAGENTA_EX + "Thanks for playing Blackjack!!")
+
+
+if __name__ == "__main__":
+    print(Fore.LIGHTMAGENTA_EX + "Hello, Welcome to Blackjack.")
+    name = raw_input(Fore.LIGHTWHITE_EX + "Enter your name to begin: ")
+    game = raw_input(Fore.LIGHTMAGENTA_EX + f'Hello, {Fore.CYAN + Style.BRIGHT + str(name)}.' + Fore.LIGHTMAGENTA_EX + Style.NORMAL + " Type 'S' to start and 'R' to run away: ").lower()
+    start_game(game)
 
 
 
