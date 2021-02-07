@@ -4,7 +4,7 @@ from pip._vendor.distlib.compat import raw_input
 
 deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]*4
 init(autoreset=True)
-highcards = ['A','J','Q','K']
+highcards = ['J','Q','K']
 
 
 def deal(deck):
@@ -38,16 +38,27 @@ def hit(deck):
 
 
 def normalize_hand(hand, ttl=0):
-    if 'A' or 'J' or 'Q' or 'K' in hand:
-        for x in hand:
-            if x in highcards:
-                ttl = ttl + 10
-            else:
-                ttl = ttl + x
-    else:
-        ttl = 0
-        for x in hand:
-            ttl = + x
+    h = []
+    a = []
+    for x in hand:
+        h.append(x)
+        if x == 'A':
+            a.append(x)
+    hrange = range(len(h))
+    arange = range(len(a))
+
+    for x in hrange:
+        if hand[x] not in highcards and hand[x] != 'A':
+            ttl = ttl + int(hand[x])
+        if hand[x] in highcards and hand[x] != 'A':
+            ttl = ttl + 10
+        # h.pop()
+    if len(a) > 0:
+        for x in arange:
+            if ttl >= 11:
+                ttl = ttl + 1
+            if ttl < 11:
+                ttl = ttl + 11
 
     return ttl
 
@@ -87,20 +98,20 @@ if __name__ == "__main__":
     if game == 's' or playAgain == 'y':
         print(Fore.LIGHTMAGENTA_EX + '\nDealing...')
         while game == 's':
+            total = 0
             dealerHand = deal(deck)
             playerHand = deal(deck)
             print(Fore.LIGHTWHITE_EX + f"The dealer shows:\n{dealerHand[0]}")
-            print(Fore.LIGHTWHITE_EX + f'Here are your cards:\n{playerHand[0]}\n{playerHand[1]}')
+            playerTotal = normalize_hand(playerHand, total)
+            print(Fore.LIGHTWHITE_EX + f'Here are your cards: (Total = {str(playerTotal)})\n{playerHand[0]}\n{playerHand[1]}')
 
-            decision = raw_input(Fore.LIGHTMAGENTA_EX + "Type 'H' to hit and 'S' to stand.").lower()
-            total = 0
+            decision = raw_input(Fore.LIGHTMAGENTA_EX + "Type 'H' to hit and 'S' to stand:").lower()
             while decision == 'h':
                 playerHand.append(hit(deck))
                 playerTotal = normalize_hand(playerHand, total)
-                print("Your Total: " + str(playerTotal))
                 print(Fore.BLUE + 'The dealer shows:')
                 print(dealerHand[0])
-                print(Fore.CYAN + 'Your hand:')
+                print(Fore.CYAN + f'Your hand: (Total = {str(playerTotal)})')
                 print_cards(playerHand)
                 if playerTotal == 21:  # Check for win
                     print(Fore.GREEN + "\nAuto-stand.\n")
