@@ -2,23 +2,31 @@ import random
 from colorama import Fore, Back, Style, init
 from pip._vendor.distlib.compat import raw_input
 
-deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]*4
-init(autoreset=True)
-highcards = ['J','Q','K']
 
+class Deck:
+
+    def __init__(self, deck=None):
+        self.deck = deck
+
+init(autoreset=True)
+highcards = ['J', 'Q', 'K']
+d1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * 4
+d2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * 8
+d4 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * 16  # (4*13 = 52 - one deck) (16*13 = 208 - four decks)
+
+deckObj = Deck(d4)
 
 def deal(deck):
     hand = []
     for i in range(2):
-        random.shuffle(deck)
         try:
-            card = deck.pop()  # The pop() method removes the item at the given index from the list and returns the removed item
-        except IndexError:
-            print("A new deck is being shuffled...")
-            deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * 4
             random.shuffle(deck)
+            card = deck.pop()  # The pop() method removes the item at the given index from the list and returns the removed item
+        except IndexError or TypeError:
+            print("A new deck is being shuffled...")
+            random.shuffle(deckObj.deck)
+            card = deckObj.deck.pop()
             print("The new deck has been shuffled.")
-            card = deck.pop()
         if card == 1:
             card = 'A'
         if card == 11:
@@ -90,7 +98,7 @@ def find_winner(dlr, plr):
 def dealer_draw(dealr):
     dealer = get_total(dealr)
     if dealer < 17:
-        dealr.append(hit(deck))
+        dealr.append(hit(deckObj.deck))
         return dealr
     if dealer >= 17:
         return dealr
@@ -112,14 +120,14 @@ def start_game(userInput):
         print(Fore.LIGHTMAGENTA_EX + '\nDealing...')
         while game == 's':
             total = 0
-            dealerHand = deal(deck)
-            playerHand = deal(deck)
+            dealerHand = deal(deckObj.deck)
+            playerHand = deal(deckObj.deck)
             print(Fore.LIGHTWHITE_EX + f"Dealer upcard:\n{dealerHand[0]}")
             playerTotal = get_total(playerHand, total)
             print(Fore.LIGHTWHITE_EX + f'Here are your cards: (Total = {str(playerTotal)})\n{playerHand[0]}\n{playerHand[1]}')
             decision = raw_input(Fore.LIGHTMAGENTA_EX + "Type 'H' to hit and 'S' to stand:").lower()
             while decision == 'h':
-                playerHand.append(hit(deck))
+                playerHand.append(hit(deckObj.deck))
                 playerTotal = get_total(playerHand, total)
                 print(Fore.BLUE + 'Dealer upcard:')
                 print(dealerHand[0])
@@ -148,6 +156,17 @@ def start_game(userInput):
 
                 # Ask the player if they will play another hand - continue/break the loop
                 playAgain = raw_input(Fore.LIGHTMAGENTA_EX + "Would you like to play again? (Y/N) ").lower()
+
+                if playAgain == 'y':
+                    continue
+                if playAgain == 'n':
+                    exit(0)
+                else:
+                    while True:
+                        print(Fore.RED + "Please enter a correct input.")
+                        playAgain = raw_input(Fore.LIGHTMAGENTA_EX + "Would you like to play again? (Y/N) ").lower()
+                        if playAgain == 'n' or 'y':
+                            break
     else:
         print(Fore.LIGHTMAGENTA_EX + "Thanks for playing Blackjack!!")
 
